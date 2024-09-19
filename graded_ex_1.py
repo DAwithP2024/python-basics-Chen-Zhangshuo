@@ -31,9 +31,13 @@ products = {
 }
 
 #Display the product categories
-def display_sorted_products(products_list,sort_order):
-    sorted_products = sorted(products_list, key=lambda x: x[1], reverse=(sort_order == 2))
-    return sorted_products
+def display_sorted_products(products_list, sort_order):
+    if sort_order == "asc":
+        sorted_list = sorted(products_list, key=lambda x: x[1])
+
+    elif sort_order == "desc":
+        sorted_list = sorted(products_list, key=lambda x: x[1], reverse=True)
+        return sorted_list
 
 #Display products in a selected category
 def display_products(products_list):
@@ -45,15 +49,17 @@ def display_categories():
     print("Available Categories:")
     for i,categories in enumerate(products.keys(),1):
         print (f"{i}.{categories}")
-
-
+        
 def add_to_cart(cart, product, quantity):
-    cart.append((product,quantity))
+    cart.append((product[0], product[1], quantity))
+    print(f"Added {quantity} x {product[0]} to the cart.")
 
 def display_cart(cart):
-    if not cart:
-        print("Your cart is empty.")
-        return
+    for product_name, price, quantity in cart:
+        total = price * quantity
+        total_cost += total
+        print(f"{product_name} - ${price} x {quantity} = ${total}")
+        print(f"Total cost: ${total_cost}")
 
 def generate_receipt(name, email, cart, total_cost, address):
     print("\n--- Receipt ---")
