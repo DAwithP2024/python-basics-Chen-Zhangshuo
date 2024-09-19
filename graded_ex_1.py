@@ -143,6 +143,7 @@ def main():
             
             elif choice == "4":
                 if cart:
+                    total_cost = sum(price * quantity for _, price, quantity in cart)
                     address = input("Enter your delivery address: ")
                     generate_receipt(name, email, cart, total_cost, address)
                 else:
