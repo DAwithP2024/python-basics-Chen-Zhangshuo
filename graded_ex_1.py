@@ -55,6 +55,7 @@ def add_to_cart(cart, product, quantity):
     print(f"Added {quantity} x {product[0]} to the cart.")
 
 def display_cart(cart):
+    total_cost=0
     for product_name, price, quantity in cart:
         total = price * quantity
         total_cost += total
