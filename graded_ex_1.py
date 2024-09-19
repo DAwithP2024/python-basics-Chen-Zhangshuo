@@ -1,4 +1,4 @@
-# Products available in the store by category
+# Dictionary of available products categorized by types
 products = {
     "IT Products": [
         ("Laptop", 1000),
@@ -30,131 +30,129 @@ products = {
     ]
 }
 
-#Display the product categories
+# Function to sort and display products based on price
 def display_sorted_products(products_list, sort_order):
     if sort_order == "asc":
         sorted_list = sorted(products_list, key=lambda x: x[1])
-
     elif sort_order == "desc":
         sorted_list = sorted(products_list, key=lambda x: x[1], reverse=True)
-        return sorted_list
+    return sorted_list
 
-#Display products in a selected category
+# Function to display products in a category
 def display_products(products_list):
-    for i,(product,price) in enumerate(products_list,1):
-        print(f"{i}.{product} -${price}")
+    print("Available products:")
+    for index, (product_name, price) in enumerate(products_list, start=1):
+        print(f"{index}. {product_name} - ${price}")
 
-# Display product categories
+# Function to display all available product categories
 def display_categories():
-    print("Available Categories:")
-    for i,categories in enumerate(products.keys(),1):
-        print (f"{i}.{categories}")
-        
+    print("Available categories:")
+    for index, category in enumerate(products.keys(), start=1):
+        print(f"{index}. {category}")
+
+# Function to add selected products to the cart
 def add_to_cart(cart, product, quantity):
     cart.append((product[0], product[1], quantity))
     print(f"Added {quantity} x {product[0]} to the cart.")
 
+# Function to display the cart contents
 def display_cart(cart):
     total_cost = 0
-    print("\n--- Your Cart ---")
     for product_name, price, quantity in cart:
         total = price * quantity
-        print(f"{product_name} - ${price} x {quantity} = ${total}")
         total_cost += total
-    print(f"\nTotal cost: ${total_cost}")
-    return total_cost  # Ensure you return total_cost for further use
+        print(f"{product_name} - ${price} x {quantity} = ${total}")
+    print(f"Total cost: ${total_cost}")
 
+# Function to generate and print the receipt
 def generate_receipt(name, email, cart, total_cost, address):
-    print("\n--- Receipt ---")
-    print(f"Name: {name}")
+    print(f"Customer: {name}")
     print(f"Email: {email}")
+    print("Items Purchased:")
+    for product_name, price, quantity in cart:
+        print(f"{quantity} x {product_name} - ${price} = ${price * quantity}")
+    print(f"Total cost: ${total_cost}")
     print(f"Delivery Address: {address}")
-    print("\nItems Purchased:")
-    for item, quantity in cart:
-        print(f"{item} x{quantity}")
-    print(f"\nTotal Cost: ${total_cost}")
-    print("Your items will be delivered in 3 days. Payment will be accepted after successful delivery.")
+    print("Your items will be delivered in 3 days.")
+    print("Payment will be accepted after successful delivery.")
 
-
+# Function to validate user name (must contain first and last name)
 def validate_name(name):
-    parts = name.split()
-    return len(parts) == 2 and all(part.isalpha() for part in parts)
+    if len(name.split()) == 2 and all(part.isalpha() for part in name.split()):
+        return True
+    return False
 
+# Function to validate email format
 def validate_email(email):
     return "@" in email
 
-
+# Main program function
 def main():
-    cart = []
-    total_cost = 0
-
-    # Ask user for name and email
-    name = input("Enter your full name: ")
+    name = input("Enter your name: ")
     while not validate_name(name):
-        print("Invalid name. Please enter both first and last name.")
-        name = input("Enter your full name: ")
+        print("Invalid name. Please enter a valid first and last name.")
+        name = input("Enter your name: ")
 
-    email = input("Enter your email address: ")
+    email = input("Enter your email: ")
     while not validate_email(email):
         print("Invalid email. Please enter a valid email.")
-        email = input("Enter your email address: ")
+        email = input("Enter your email: ")
 
+    cart = []
+    
+    # Main loop for shopping categories and products
     while True:
-        # Display categories
         display_categories()
-        try:
-            category_choice = int(input("Choose a category (number): "))
-            if category_choice < 1 or category_choice > len(products):
-                raise ValueError
-        except ValueError:
+        category_choice = input("Choose a category (enter number): ")
+        
+        if not category_choice.isdigit() or int(category_choice) not in range(1, len(products) + 1):
             print("Invalid choice. Please enter a valid category number.")
             continue
 
-        # Get selected category and show products
-        category_name = list(products.keys())[category_choice - 1]
-        print(f"\nYou selected {category_name}:\n")
-        display_products(products[category_name])
-
-        # Ask for product selection
+        category = list(products.keys())[int(category_choice) - 1]
+        product_list = products[category]
+        
+        # Loop to select products, sort, or finish shopping
         while True:
-            choice = input("\n1. Select a product to buy\n2. Sort products by price\n3. Go back to category selection\n4. Finish shopping\nChoose an option (number): ")
+            display_products(product_list)
+            print("Options: 1. Select a product to buy  2. Sort products by price  3. Go back to categories  4. Finish shopping")
+            action = input("Enter your choice: ")
 
-            if choice == "1":
-                try:
-                    product_choice = int(input("Enter the product number: "))
-                    if product_choice < 1 or product_choice > len(products[category_name]):
-                        raise ValueError
-                    product = products[category_name][product_choice - 1]
-                except ValueError:
-                    print("Invalid product number. Please try again.")
+            if action == '1':
+                product_choice = input("Enter the product number to buy: ")
+                if not product_choice.isdigit() or int(product_choice) not in range(1, len(product_list) + 1):
+                    print("Invalid product choice.")
                     continue
-                
-                quantity = int(input(f"How many {product[0]}s would you like to buy? "))
-                add_to_cart(cart, product[0], quantity)
-                total_cost += product[1] * quantity
-                print(f"Added {quantity} x {product[0]} to cart.")
-            
-            elif choice == "2":
-                sort_order = input("Enter 1 for ascending or 2 for descending: ")
-                reverse = sort_order == "2"
-                sorted_products = sorted(products[category_name], key=lambda x: x[1], reverse=reverse)
+                product = product_list[int(product_choice) - 1]
+                quantity = input("Enter the quantity: ")
+                if not quantity.isdigit() or int(quantity) <= 0:
+                    print("Invalid quantity.")
+                    continue
+                add_to_cart(cart, product, int(quantity))
+
+            elif action == '2':
+                sort_order = input("Enter 1 for ascending order or 2 for descending order: ")
+                if sort_order == '1':
+                    sorted_products = display_sorted_products(product_list, "asc")
+                elif sort_order == '2':
+                    sorted_products = display_sorted_products(product_list, "desc")
+                else:
+                    print("Invalid sort order.")
+                    continue
                 display_products(sorted_products)
-            
-            elif choice == "3":
+
+            elif action == '3':
                 break
-            
-            elif choice == "4":
+
+            elif action == '4':
                 if cart:
                     total_cost = sum(price * quantity for _, price, quantity in cart)
                     address = input("Enter your delivery address: ")
                     generate_receipt(name, email, cart, total_cost, address)
                 else:
-                    print("Thank you for using our portal. Hope you buy something next time. Have a nice day!")
+                    print("Thank you for visiting. You didn't buy anything this time.")
                 return
             
-            else:
-                print("Invalid option. Please try again.")
-
 """ The following block makes sure that the main() function is called when the program is run. 
 It also checks that this is the module that's being run directly, and not being used as a module in some other program. 
 In that case, only the part that's needed will be executed and not the entire program """
